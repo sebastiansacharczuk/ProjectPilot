@@ -55,7 +55,7 @@ class SignInActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
             if(FirebaseUtil.isLoggedIn()){
-                startActivity(Intent(this@SignInActivity, MenuActivity::class.java))
+                startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                 finish()
             }
 
@@ -155,7 +155,7 @@ class SignInActivity : ComponentActivity() {
                     //Toast.makeText(this@SignInActivity, "SignIn Successfully", Toast.LENGTH_SHORT).show()
                     AndroidUtil.makeToast(this@SignInActivity, "SignIn Successfully")
                     startActivity(
-                        Intent(this@SignInActivity, MenuActivity::class.java)
+                        Intent(this@SignInActivity, MainActivity::class.java)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )
                 } else {

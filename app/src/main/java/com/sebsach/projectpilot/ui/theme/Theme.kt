@@ -14,11 +14,11 @@ val customColorScheme = ColorScheme(
     primary = Color.Black,
     onPrimary = Color.White,
     primaryContainer = Color(0xFF1976D2),
-    onPrimaryContainer = Color.Red,
+    onPrimaryContainer = Color.Yellow,
     inversePrimary = Color.White,
     secondary = Color(0xFF3C3C3C),
     onSecondary = Color.Black,
-    secondaryContainer = Color(0xFFFFA000),
+    secondaryContainer = Color(0xFFCFCFCF),
     onSecondaryContainer = Color.Black,
     tertiary = Color(0xFF4CAF50),
     onTertiary = Color.White,
@@ -39,7 +39,7 @@ val customColorScheme = ColorScheme(
     onErrorContainer = Color.White,
     outline = Color(0xFF9E9E9E),
     outlineVariant = Color(0xFF757575),
-    scrim = Color.Red
+    scrim = Color.Transparent
 )
 
 @Composable
