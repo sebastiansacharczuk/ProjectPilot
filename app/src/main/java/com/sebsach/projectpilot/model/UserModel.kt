@@ -5,6 +5,6 @@ package com.sebsach.projectpilot.model
  * github: https://github.com/sebastiansacharczuk
  */
 data class UserModel(
-    val username: String,
-    val uid: String
+    val username: String = "",
+    val uid: String = ""
 )
