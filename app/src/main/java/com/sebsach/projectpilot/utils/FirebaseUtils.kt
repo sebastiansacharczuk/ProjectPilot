@@ -1,6 +1,7 @@
 package com.sebsach.projectpilot.utils
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -8,7 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
  * @author Sebastian Sacharczuk
  * github: https://github.com/sebastiansacharczuk
  */
-class FirebaseUtil {
+class FirebaseUtils {
 
     companion object {
         fun currentUserId(): String? {
@@ -20,11 +21,12 @@ class FirebaseUtil {
         }
 
         fun currentUserDetails(): DocumentReference? {
-            return currentUserId()?.let {
-                FirebaseFirestore.getInstance().collection("users").document(
-                    it
-                )
-            }
+            return currentUserId()?.let { FirebaseFirestore.getInstance().collection("users").document() }
         }
+
+        fun allUsersCollectionReference(): CollectionReference {
+            return FirebaseFirestore.getInstance().collection("users")
+        }
+
     }
 }
