@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.sebsach.projectpilot.R
-import com.sebsach.projectpilot.utils.AndroidUtil
-import com.sebsach.projectpilot.utils.FirebaseUtil
+import com.sebsach.projectpilot.utils.AndroidUtils
+import com.sebsach.projectpilot.utils.FirebaseUtils
 import com.sebsach.projectpilot.model.UserModel
 import com.sebsach.projectpilot.ui.theme.ProjectPilotTheme
 /**
@@ -157,7 +157,7 @@ class SignUpActivity : ComponentActivity() {
                 if (task.isSuccessful) {
                     setUsername(inputEmail) { success ->
                         if (success) {
-                            AndroidUtil.makeToast(this@SignUpActivity, "Signup Successfully")
+                            AndroidUtils.makeToast(this@SignUpActivity, "Signup Successfully")
                             //startActivity(Intent(this@SignUpActivity, SignInActivity::class.java))
                             finish()
                         } else {
@@ -171,9 +171,9 @@ class SignUpActivity : ComponentActivity() {
     }
 
     private fun setUsername(username: String, callback: (Boolean) -> Unit) {
-        FirebaseUtil.currentUserId()
+        FirebaseUtils.currentUserId()
             ?.let { UserModel(username, it) }?.let {
-                FirebaseUtil.currentUserDetails()?.set(it)
+                FirebaseUtils.currentUserDetails()?.set(it)
                     ?.addOnCompleteListener(this@SignUpActivity) { task ->
                         callback(task.isSuccessful)
                     }

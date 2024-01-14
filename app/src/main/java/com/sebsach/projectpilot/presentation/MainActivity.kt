@@ -187,6 +187,7 @@ fun ProjectsScreen() {
         Text(text = "Projects")
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "List of all projects will be displayed here.")
+
     }
 }
 

@@ -38,9 +38,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.sebsach.projectpilot.R
-import com.sebsach.projectpilot.utils.AndroidUtil
+import com.sebsach.projectpilot.utils.AndroidUtils
 import com.sebsach.projectpilot.ui.theme.ProjectPilotTheme
-import com.sebsach.projectpilot.utils.FirebaseUtil
+import com.sebsach.projectpilot.utils.FirebaseUtils
 
 /**
  * @author Sebastian Sacharczuk
@@ -54,7 +54,7 @@ class SignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
-            if(FirebaseUtil.isLoggedIn()){
+            if(FirebaseUtils.isLoggedIn()){
                 startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                 finish()
             }
@@ -108,7 +108,7 @@ class SignInActivity : ComponentActivity() {
                         )
                         Button(onClick = {
                             if(inputNickname.isEmpty() || inputPassword.isEmpty()){
-                                AndroidUtil.makeToast(this@SignInActivity, "Enter email and password")
+                                AndroidUtils.makeToast(this@SignInActivity, "Enter email and password")
                             }
                             else{
                                 signInUser(inputNickname, inputPassword)
@@ -153,14 +153,14 @@ class SignInActivity : ComponentActivity() {
             .addOnCompleteListener(this@SignInActivity){ task ->
                 if(task.isSuccessful){
                     //Toast.makeText(this@SignInActivity, "SignIn Successfully", Toast.LENGTH_SHORT).show()
-                    AndroidUtil.makeToast(this@SignInActivity, "SignIn Successfully")
+                    AndroidUtils.makeToast(this@SignInActivity, "SignIn Successfully")
                     startActivity(
                         Intent(this@SignInActivity, MainActivity::class.java)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )
                 } else {
                     //Toast.makeText(this@SignInActivity, "SignIn Failed", Toast.LENGTH_SHORT).show()
-                    AndroidUtil.makeToast(this@SignInActivity, "SignIn Failed")
+                    AndroidUtils.makeToast(this@SignInActivity, "SignIn Failed")
                 }
             }
 
