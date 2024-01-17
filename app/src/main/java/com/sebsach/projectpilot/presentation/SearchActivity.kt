@@ -142,9 +142,8 @@ class SearchActivity : ComponentActivity() {
                                         contentColor = Color.Black
                                     )
                                 ) {
-                                    Text(text = user.username)
+                                    Text(text = user.username + if(user.uid == FirebaseUtils.currentUserId()) " (me)" else "")
                                 }
-
                             }
                         }
 

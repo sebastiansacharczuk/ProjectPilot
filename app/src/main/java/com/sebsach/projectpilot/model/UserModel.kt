@@ -5,6 +5,7 @@ package com.sebsach.projectpilot.model
  * github: https://github.com/sebastiansacharczuk
  */
 data class UserModel(
-    val username: String = "",
-    val uid: String = ""
+    var username: String = "",
+    var uid: String = "",
+    var projectRefs: List<ProjectRef> = emptyList()
 )

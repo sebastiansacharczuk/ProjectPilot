@@ -61,6 +61,7 @@ data class NavigationItem(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        println("MainActivity: onCreate")
         setContent {
             ProjectPilotTheme {
                 val navController = rememberNavController()
@@ -114,7 +115,7 @@ class MainActivity : ComponentActivity() {
                                         icon = {
                                             Icon(
                                                 imageVector = if (index == selectedItemIndex) {
-                                                    item.selectedIcon
+                                                                item.selectedIcon
                                                 } else item.unselectedIcon,
                                                 contentDescription = item.name
                                             )
@@ -166,28 +167,11 @@ class MainActivity : ComponentActivity() {
                                     SettingsScreen()
                                 }
                             }
-
                         }
-                    }
-                }
+                    } // ModalNavigationDrawer
+                } // Surface
             }
         }
-    }
-}
-
-@Composable
-fun ProjectsScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Projects")
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "List of all projects will be displayed here.")
-
     }
 }
 
