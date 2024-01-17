@@ -5,6 +5,9 @@ package com.sebsach.projectpilot.model
  * github: https://github.com/sebastiansacharczuk
  */
 data class ProjectModel(
+    val leader: String,
     val name: String,
-    val members: List<String>
+    var members: List<String?> = emptyList(),
+    var tasks: List<String> = emptyList()
 )
+

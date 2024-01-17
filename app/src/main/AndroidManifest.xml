@@ -22,7 +22,7 @@
         <activity android:name=".presentation.SignUpActivity"/>
         <activity android:name=".presentation.SearchActivity"/>
         <activity android:name=".presentation.MainActivity"/>
-        <activity android:name=".presentation.ChatActivity"/>
+        <activity android:name=".presentation.ProjectActivity"/>
 
 
 

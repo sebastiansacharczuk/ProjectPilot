@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -29,13 +27,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -43,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.sebsach.projectpilot.presentation.screens.JoinRequestsScreen
+import com.sebsach.projectpilot.presentation.screens.ProjectListScreen
+import com.sebsach.projectpilot.presentation.screens.SettingsScreen
 import com.sebsach.projectpilot.ui.theme.ProjectPilotTheme
 import kotlinx.coroutines.launch
 
@@ -158,7 +157,7 @@ class MainActivity : ComponentActivity() {
                                innerPadding ->
                             NavHost(navController = navController, startDestination = "Projects", modifier = Modifier.padding(innerPadding)) {
                                 composable("Projects") {
-                                    ProjectsScreen()
+                                    ProjectListScreen()
                                 }
                                 composable("JoinRequests") {
                                     JoinRequestsScreen()
@@ -172,36 +171,5 @@ class MainActivity : ComponentActivity() {
                 } // Surface
             }
         }
-    }
-}
-
-@Composable
-fun JoinRequestsScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Join Requests")
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Here you can manage all your join requests.")
-    }
-}
-
-@Composable
-fun SettingsScreen() {
-    println("SettingsScreen")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Settings")
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Adjust your settings here.")
     }
 }

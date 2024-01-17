@@ -7,5 +7,5 @@ package com.sebsach.projectpilot.model
 data class UserModel(
     var username: String = "",
     var uid: String = "",
-    var projectRefs: List<ProjectRef> = emptyList()
+    var projectRefModels: List<ProjectRefModel> = emptyList()
 )
