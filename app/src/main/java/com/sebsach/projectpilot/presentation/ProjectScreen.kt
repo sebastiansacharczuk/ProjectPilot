@@ -1,5 +1,7 @@
 package com.sebsach.projectpilot.presentation
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat.startActivity
 import com.sebsach.projectpilot.model.ProjectRef
 import com.sebsach.projectpilot.utils.FirebaseUtils
 import kotlinx.coroutines.delay
@@ -38,6 +43,7 @@ fun ProjectsScreen() {
     val projectRefs = remember { mutableStateOf(listOf<ProjectRef>()) }
     val loading = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
         scope.launch {
@@ -85,7 +91,9 @@ fun ProjectsScreen() {
                 else{
                     items(projectRefs.value) { projectRef ->
                         Button(
-                            onClick = {},
+                            onClick = {
+                                context.startActivity(Intent(context, ChatActivity::class.java))
+                            },
                             colors = ButtonDefaults.buttonColors( containerColor = Color(0xFFEBEBEB), contentColor = Color.Black)
                         ) {
                             Text(text = projectRef.name)
