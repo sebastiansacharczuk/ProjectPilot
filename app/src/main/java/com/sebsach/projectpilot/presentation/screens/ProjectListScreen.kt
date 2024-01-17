@@ -22,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.firestore.FirebaseFirestore
 import com.sebsach.projectpilot.model.ProjectRefModel
 import com.sebsach.projectpilot.presentation.ProjectActivity
 import com.sebsach.projectpilot.utils.AndroidUtils
@@ -47,12 +49,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectListScreen() {
-    val projectRefsModel = remember { mutableStateOf(listOf<ProjectRefModel>()) }
+    val projectRefsList = remember { mutableStateOf(listOf<ProjectRefModel>()) }
     val loading = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    var text by remember { mutableStateOf("") }
+    var inputProjectName by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     val username = FirebaseUtils.currentUserEmail()
 
@@ -60,18 +62,26 @@ fun ProjectListScreen() {
         scope.launch {
             delay(2000)
             val userId = FirebaseUtils.currentUserId()
+            println("id " + FirebaseUtils.currentUserId())
             if (userId != null) {
-                FirebaseUtils.allUsersCollectionReference()
+                FirebaseFirestore.getInstance().collection("users")
                     .document(userId)
-                    .collection("project_refs")
                     .get()
                     .addOnSuccessListener { result ->
-                        projectRefsModel.value = result.toObjects(ProjectRefModel::class.java)
-                        loading.value = false
+                    val hashMapList = result.get("projectRefs") as List<HashMap<String, Any>>
+                    val projectRefModelList = hashMapList.map { hashMap ->
+                        ProjectRefModel(
+                            id = hashMap["id"] as String,
+                            name = hashMap["name"] as String
+                        )
                     }
+                    projectRefsList.value = projectRefModelList
+                    loading.value = false
+                }
                     .addOnFailureListener{ result ->
                         println(result.message)
                     }
+
             }
         }
     }
@@ -83,17 +93,17 @@ fun ProjectListScreen() {
             title = { Text("Project name") },
             text = {
                 TextField(
-                    value = text,
-                    onValueChange = { text = it }
+                    value = inputProjectName,
+                    onValueChange = { inputProjectName = it }
                 )
             },
             confirmButton = {
                 Button(onClick = {
                     if(username != null)
-                        FirebaseUtils.createProject(text, username)
+                        FirebaseUtils.createProject(inputProjectName, username)
                     else
                         println("problem occurred")
-                    text = ""
+                    inputProjectName = ""
                     showDialog = false
                 }) {
                     Text("OK")
@@ -101,7 +111,7 @@ fun ProjectListScreen() {
             },
             dismissButton = {
                 Button(onClick = {
-                    text = ""
+                    inputProjectName = ""
                     showDialog = false
                 }) {
                     Text("Cancel")
@@ -123,30 +133,40 @@ fun ProjectListScreen() {
             Spacer(modifier = Modifier.height(12.dp))
             LinearProgressIndicator()
         } else {
-            Button(onClick = { showDialog = true }) {
-                Text("Create project")
-                Icon(imageVector = Icons.Default.Add, contentDescription = "create project")
-            }
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                if(projectRefsModel.value.isEmpty()){
-                    item(key = null){
-                        Text(text = "Recently you have no active projects")
-                    }
+            Column{
+                Button(onClick = { showDialog = true }) {
+                    Text("Create project")
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "create project")
                 }
-                else{
-                    items(projectRefsModel.value) { projectRef ->
-                        Button(
-                            onClick = {
-                                context.startActivity(Intent(context, ProjectActivity::class.java))
-                            },
-                            colors = ButtonDefaults.buttonColors( containerColor = Color(0xFFEBEBEB), contentColor = Color.Black)
-                        ) {
-                            Text(text = projectRef.name)
+
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    if (projectRefsList.value.isEmpty()) {
+                        item(key = null) {
+                            Text(text = "Recently you have no active projects")
+                        }
+                    } else {
+                        items(projectRefsList.value) { projectRef ->
+                            Button(
+                                onClick = {
+                                    context.startActivity(
+                                        Intent(
+                                            context,
+                                            ProjectActivity::class.java
+                                        )
+                                    )
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFFEBEBEB
+                                    ), contentColor = Color.Black
+                                )
+                            ) {
+                                Text(text = projectRef.name)
+                            }
                         }
                     }
                 }

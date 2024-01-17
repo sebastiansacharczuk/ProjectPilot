@@ -5,6 +5,6 @@ package com.sebsach.projectpilot.model
  * @github https://github.com/sebastiansacharczuk
  */
 data class ProjectRefModel(
-    val name: String = "",
-    val id: String = ""
+    val id: String = "",
+    val name: String = ""
 )

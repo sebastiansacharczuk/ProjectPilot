@@ -1,10 +1,13 @@
 package com.sebsach.projectpilot.utils
 
+import android.annotation.SuppressLint
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sebsach.projectpilot.model.ProjectModel
+import com.sebsach.projectpilot.model.ProjectRefModel
 
 /**
  * @author Sebastian Sacharczuk
@@ -35,9 +38,18 @@ class FirebaseUtils {
         fun projectDetails(id: String): DocumentReference {
             return FirebaseFirestore.getInstance().collection("projects").document(id)
         }
+
         fun createProject(projectName: String, userName: String) {
-            FirebaseFirestore.getInstance().collection("projects").document()
-                .set(ProjectModel(userName, projectName, listOf(currentUserId())))
+            val projectRef = FirebaseFirestore.getInstance().collection("projects").document()
+
+            currentUserId()?.let { addProjectRef(it, projectRef.id, projectName) }
+
+            projectRef.set(ProjectModel(userName, projectName, listOf(currentUserId())))
+        }
+
+        fun addProjectRef(uid: String, projectName: String, referenceID: String) {
+            allUsersCollectionReference().document(uid)
+                .update("projectRefs", FieldValue.arrayUnion(ProjectRefModel(projectName, referenceID)))
         }
     }
 }

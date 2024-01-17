@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.sebsach.projectpilot.R
 import com.sebsach.projectpilot.utils.AndroidUtils
 import com.sebsach.projectpilot.utils.FirebaseUtils
@@ -173,10 +174,12 @@ class SignUpActivity : ComponentActivity() {
     private fun setUsername(username: String, callback: (Boolean) -> Unit) {
         FirebaseUtils.currentUserId()
             ?.let { UserModel(username, it) }?.let {
-                FirebaseUtils.currentUserDetails()?.set(it)
-                    ?.addOnCompleteListener(this@SignUpActivity) { task ->
-                        callback(task.isSuccessful)
-                    }
+                FirebaseUtils.currentUserId()?.let { it1 ->
+                    FirebaseFirestore.getInstance().collection("users").document(it1).set(it)
+                        .addOnCompleteListener(this@SignUpActivity) { task ->
+                            callback(task.isSuccessful)
+                        }
+                }
             }
     }
 }
