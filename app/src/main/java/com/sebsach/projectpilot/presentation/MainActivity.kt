@@ -149,7 +149,6 @@ class MainActivity : ComponentActivity() {
                                         }) {
                                             Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                                         }
-
                                     }
                                 )
                             }

@@ -20,10 +20,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sebsach.projectpilot.model.ProjectRefModel
 import com.sebsach.projectpilot.presentation.ProjectActivity
-import com.sebsach.projectpilot.utils.AndroidUtils
 import com.sebsach.projectpilot.utils.FirebaseUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -61,28 +58,27 @@ fun ProjectListScreen() {
 
     LaunchedEffect(key1 = Unit) {
         scope.launch {
-            delay(2000)
+            delay(1200)
+
             val userId = FirebaseUtils.currentUserId()
-            println("id " + FirebaseUtils.currentUserId())
             if (userId != null) {
                 FirebaseFirestore.getInstance().collection("users")
                     .document(userId)
                     .get()
                     .addOnSuccessListener { result ->
-                    val hashMapList = result.get("projectRefs") as List<HashMap<String, Any>>
-                    val projectRefModelList = hashMapList.map { hashMap ->
-                        ProjectRefModel(
-                            id = hashMap["id"] as String,
-                            name = hashMap["name"] as String
-                        )
+                        val hashMapList = result.get("projectRefs") as List<HashMap<String, Any>>
+                        val projectRefModelList = hashMapList.map { hashMap ->
+                            ProjectRefModel(
+                                id = hashMap["id"] as String,
+                                name = hashMap["name"] as String
+                            )
+                        }
+                        projectRefsList.value = projectRefModelList
+                        loading.value = false
                     }
-                    projectRefsList.value = projectRefModelList
-                    loading.value = false
-                }
                     .addOnFailureListener{ result ->
                         println(result.message)
                     }
-
             }
         }
     }
@@ -153,10 +149,8 @@ fun ProjectListScreen() {
                             Button(
                                 onClick = {
                                     context.startActivity(
-                                        Intent(
-                                            context,
-                                            ProjectActivity::class.java
-                                        )
+                                        Intent(context, ProjectActivity::class.java)
+                                            .putExtra("id", projectRef.id)
                                     )
                                 },
                                 colors = ButtonDefaults.buttonColors(

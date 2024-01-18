@@ -32,16 +32,8 @@ import kotlin.coroutines.coroutineContext
 @Composable
 fun ProjectScreen(){
     val tasks = mutableListOf<String>()
-    val context = LocalContext.current
-    val coroutine = rememberCoroutineScope()
     Column {
-        Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            IconButton(
-                onClick = { coroutine.launch { (context as? Activity)?.finish() } },
-                modifier = Modifier.padding(start = 6.dp, bottom = 10.dp)
-            ) { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Search") }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
+
         LazyColumn(
             modifier = Modifier.padding(10.dp)
         ) {
