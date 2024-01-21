@@ -1,14 +1,11 @@
 package com.sebsach.projectpilot.presentation
 
 
-import android.content.ContentValues.TAG
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,11 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,12 +37,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.firestore.CollectionReference
-import com.sebsach.projectpilot.model.UserModel
+import com.sebsach.projectpilot.models.UserModel
 import com.sebsach.projectpilot.ui.theme.ProjectPilotTheme
 import com.sebsach.projectpilot.utils.FirebaseUtils
 
@@ -99,7 +86,7 @@ class SearchActivity : ComponentActivity() {
                             IconButton(
                                 onClick = {
                                     if (inputSearch.isEmpty()) {
-                                        FirebaseUtils.allUsersCollectionReference()
+                                        FirebaseUtils.allUsers()
                                             .get()
                                             .addOnSuccessListener { result ->
                                                 users.value = result.documents.mapNotNull { it.toObject(UserModel::class.java) }
@@ -110,7 +97,7 @@ class SearchActivity : ComponentActivity() {
                                         val startAt = inputSearch
                                         val endAt = "$inputSearch\uf8ff"
 
-                                        FirebaseUtils.allUsersCollectionReference()
+                                        FirebaseUtils.allUsers()
                                             .orderBy("username")
                                             .startAt(startAt)
                                             .endAt(endAt)

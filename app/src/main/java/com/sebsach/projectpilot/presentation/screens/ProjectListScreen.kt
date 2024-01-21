@@ -3,20 +3,18 @@ package com.sebsach.projectpilot.presentation.screens
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -32,11 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
-import com.google.firebase.firestore.FirebaseFirestore
-import com.sebsach.projectpilot.model.ProjectRefModel
 import com.sebsach.projectpilot.presentation.ProjectActivity
 import com.sebsach.projectpilot.utils.FirebaseUtils
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -47,7 +42,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectListScreen() {
-    val projectRefsList = remember { mutableStateOf(listOf<ProjectRefModel>()) }
+    var projectRefsList by remember { mutableStateOf(listOf<Map<String, String>>()) }
     val loading = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -58,31 +53,14 @@ fun ProjectListScreen() {
 
     LaunchedEffect(key1 = Unit) {
         scope.launch {
-            delay(1200)
 
             val userId = FirebaseUtils.currentUserId()
             if (userId != null) {
-                FirebaseFirestore.getInstance().collection("users")
-                    .document(userId)
-                    .get()
-                    .addOnSuccessListener { result ->
-                        val hashMapList = result.get("projectRefs") as List<HashMap<String, Any>>
-                        val projectRefModelList = hashMapList.map { hashMap ->
-                            ProjectRefModel(
-                                id = hashMap["id"] as String,
-                                name = hashMap["name"] as String
-                            )
-                        }
-                        projectRefsList.value = projectRefModelList
-                        loading.value = false
-                    }
-                    .addOnFailureListener{ result ->
-                        println(result.message)
-                    }
+                projectRefsList = FirebaseUtils.getUserProjectRefs(userId)
+                loading.value = false
             }
         }
     }
-
 
     if (showDialog) {
         AlertDialog(
@@ -91,13 +69,19 @@ fun ProjectListScreen() {
             text = {
                 TextField(
                     value = inputProjectName,
-                    onValueChange = { inputProjectName = it }
+                    onValueChange = { inputProjectName = it },
+                    label = { Text(text = "name")}
+                )
+                TextField(
+                    value = inputProjectName,
+                    onValueChange = { inputProjectName = it },
+                    label = { Text(text = "name")}
                 )
             },
             confirmButton = {
                 Button(onClick = {
                     if(username != null)
-                        FirebaseUtils.createProject(inputProjectName, username)
+                        FirebaseUtils.createProject(inputProjectName)
                     else
                         println("problem occurred")
                     inputProjectName = ""
@@ -118,9 +102,7 @@ fun ProjectListScreen() {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -130,27 +112,37 @@ fun ProjectListScreen() {
             Spacer(modifier = Modifier.height(12.dp))
             LinearProgressIndicator()
         } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                IconButton(onClick = { showDialog = true }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "create project")
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.Start
+            ){
+
+                Button(
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    Text(text = "New Project")
+                    // Icon(imageVector = Icons.Default.Add, contentDescription = "create project")
                 }
 
                 LazyColumn(
                     modifier = Modifier
-                        .padding(10.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (projectRefsList.value.isEmpty()) {
+                    if (projectRefsList.isEmpty()) {
                         item(key = null) {
                             Text(text = "Recently you have no active projects")
                         }
                     } else {
-                        items(projectRefsList.value) { projectRef ->
+                        items(projectRefsList) { projectRef ->
                             Button(
                                 onClick = {
                                     context.startActivity(
                                         Intent(context, ProjectActivity::class.java)
-                                            .putExtra("id", projectRef.id)
+                                            .putExtra("id", projectRef["id"])
                                     )
                                 },
                                 colors = ButtonDefaults.buttonColors(
@@ -159,7 +151,7 @@ fun ProjectListScreen() {
                                     ), contentColor = Color.Black
                                 )
                             ) {
-                                Text(text = projectRef.name)
+                                projectRef["name"]?.let { Text(text = it) }
                             }
                         }
                     }
@@ -168,3 +160,4 @@ fun ProjectListScreen() {
         }
     }
 }
+

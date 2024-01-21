@@ -1,20 +1,19 @@
 package com.sebsach.projectpilot.utils
 
-import android.annotation.SuppressLint
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.sebsach.projectpilot.model.ProjectModel
-import com.sebsach.projectpilot.model.ProjectRefModel
+import com.google.firebase.firestore.toObject
+import com.sebsach.projectpilot.models.ProjectModel
+import com.sebsach.projectpilot.models.UserModel
+import kotlinx.coroutines.tasks.await
 
 /**
  * @author Sebastian Sacharczuk
  * github: https://github.com/sebastiansacharczuk
  */
 class FirebaseUtils {
-
     companion object {
         fun currentUserId(): String? {
             return FirebaseAuth.getInstance().uid
@@ -22,34 +21,94 @@ class FirebaseUtils {
         fun currentUserEmail(): String? {
             return FirebaseAuth.getInstance().currentUser?.email
         }
-
         fun isLoggedIn(): Boolean{
             return currentUserId() != null
         }
-
-        fun currentUserDetails(): DocumentReference? {
-            return currentUserId()?.let { FirebaseFirestore.getInstance().collection("users").document() }
-        }
-
-        fun allUsersCollectionReference(): CollectionReference {
+        fun allUsers(): CollectionReference {
             return FirebaseFirestore.getInstance().collection("users")
         }
-
-        fun projectDetails(id: String): DocumentReference {
-            return FirebaseFirestore.getInstance().collection("projects").document(id)
+        fun allProjects(): CollectionReference {
+            return FirebaseFirestore.getInstance().collection("projects")
         }
-
-        fun createProject(projectName: String, userName: String) {
-            val projectRef = FirebaseFirestore.getInstance().collection("projects").document()
-
-            currentUserId()?.let { addProjectRef(it, projectRef.id, projectName) }
-
-            projectRef.set(ProjectModel(userName, projectName, listOf(currentUserId())))
+        fun userById(id: String): UserModel {
+            var user = UserModel()
+            allUsers().document(id)
+                .get().
+                addOnSuccessListener { documentSnapshot -> user =
+                    documentSnapshot.toObject<UserModel>()!!
+                }
+            return user
         }
+        fun usersById(ids: List<String?>, onSuccess: (List<UserModel>) -> Unit) {
+            val usersCollection = allUsers()
 
+            // Create a new list to hold the user documents
+            val users = mutableListOf<UserModel>()
+
+            // Fetch each user by ID
+            for (id in ids) {
+                if (id != null) {
+                    usersCollection.document(id).get()
+                        .addOnSuccessListener { document ->
+                            val user = document.toObject<UserModel>()
+                            if (user != null) {
+                                users.add(user)
+                                println("User fetched with ID: $id")
+                            } else {
+                                println("No user found with ID: $id")
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            println("Error getting user with ID: $id, ${exception.message}")
+                        }
+                        .addOnCompleteListener {
+                            onSuccess(users)
+                        }
+                }
+            }
+        }
+        fun createProject(projectName: String) {
+            val projectRef = allProjects().document()
+
+            currentUserId()?.let {
+                addProjectRef(it, projectName, projectRef.id)
+                projectRef.set(ProjectModel(projectRef.id, it, projectName, listOf(currentUserId())))
+            }
+        }
+        fun addNewTask(id: String, task: String){
+            allProjects().document(id).update("tasks", FieldValue.arrayUnion(mapOf("task" to task, "done" to false)))
+        }
         fun addProjectRef(uid: String, projectName: String, referenceID: String) {
-            allUsersCollectionReference().document(uid)
-                .update("projectRefs", FieldValue.arrayUnion(ProjectRefModel(projectName, referenceID)))
+            allUsers().document(uid)
+                .update("projectRefs", FieldValue.arrayUnion(mapOf("id" to referenceID, "name" to projectName)))
+            println(referenceID + projectName)
+        }
+        suspend fun getUserProjectRefs(userId: String): List<Map<String, String>> {
+            val documentSnapshot = allUsers().document(userId)
+                .get()
+                .await() // This will suspend the function until the result is available
+
+            return documentSnapshot.get("projectRefs") as List<Map<String, String>>
+        }
+        fun getProjectDetails(
+            id: String,
+            onSuccess: (ProjectModel) -> Unit,
+            onFailure: () -> Unit
+        ) {
+            allProjects().document(id)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null || snapshot == null || !snapshot.exists()) {
+                        onFailure()
+                    } else {
+                        val projectModel = snapshot.toObject(ProjectModel::class.java)
+                        println("Success: $projectModel")
+                        if (projectModel != null) {
+                            onSuccess(projectModel)
+                        } else {
+                            onFailure()
+                        }
+                    }
+                }
         }
     }
 }

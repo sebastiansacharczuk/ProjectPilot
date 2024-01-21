@@ -38,7 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.sebsach.projectpilot.R
 import com.sebsach.projectpilot.utils.AndroidUtils
 import com.sebsach.projectpilot.utils.FirebaseUtils
-import com.sebsach.projectpilot.model.UserModel
+import com.sebsach.projectpilot.models.UserModel
 import com.sebsach.projectpilot.ui.theme.ProjectPilotTheme
 /**
  * @author Sebastian Sacharczuk

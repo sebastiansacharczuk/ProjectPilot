@@ -1,4 +1,4 @@
-package com.sebsach.projectpilot.model
+package com.sebsach.projectpilot.models
 
 /**
  * @author Sebastian Sacharczuk
@@ -7,5 +7,5 @@ package com.sebsach.projectpilot.model
 data class UserModel(
     var username: String = "",
     var uid: String = "",
-    var projectRefs: List<ProjectRefModel> = emptyList()
+    var projectRefs: List<Map<String, String>> = emptyList()
 )
