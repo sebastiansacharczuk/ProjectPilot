@@ -1,6 +1,5 @@
 package com.sebsach.projectpilot.presentation
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerValue
@@ -43,6 +41,7 @@ import com.sebsach.projectpilot.presentation.screens.JoinRequestsScreen
 import com.sebsach.projectpilot.presentation.screens.ProjectListScreen
 import com.sebsach.projectpilot.presentation.screens.SettingsScreen
 import com.sebsach.projectpilot.ui.theme.ProjectPilotTheme
+import com.sebsach.projectpilot.utils.FirebaseUtils
 import kotlinx.coroutines.launch
 
 /**
@@ -63,6 +62,7 @@ class MainActivity : ComponentActivity() {
         println("MainActivity: onCreate")
         setContent {
             ProjectPilotTheme {
+                val UID = FirebaseUtils.currentUserId()
                 val navController = rememberNavController()
                 val items = listOf(
                     NavigationItem(
@@ -142,13 +142,6 @@ class MainActivity : ComponentActivity() {
                                                 contentDescription = "Menu"
                                             )
                                         }
-                                    },
-                                    actions = {
-                                        IconButton(onClick = {
-                                            startActivity(Intent(this@MainActivity, SearchActivity::class.java))
-                                        }) {
-                                            Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-                                        }
                                     }
                                 )
                             }
@@ -156,7 +149,9 @@ class MainActivity : ComponentActivity() {
                                innerPadding ->
                             NavHost(navController = navController, startDestination = "Projects", modifier = Modifier.padding(innerPadding)) {
                                 composable("Projects") {
-                                    ProjectListScreen()
+                                    if (UID != null) {
+                                        ProjectListScreen(UID)
+                                    }
                                 }
                                 composable("JoinRequests") {
                                     JoinRequestsScreen()

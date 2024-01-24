@@ -64,7 +64,7 @@ class ProjectActivity : ComponentActivity() {
         setContent {
             ProjectPilotTheme {
                 val projectModel = remember { mutableStateOf<ProjectModel?>(null) }
-
+                val currUID = FirebaseUtils.currentUserId()
                 LaunchedEffect(Unit) {
                     val receivedId = intent.getStringExtra("id")
                     if (receivedId != null) {
@@ -107,7 +107,7 @@ class ProjectActivity : ComponentActivity() {
                             unselectedIcon = Icons.Outlined.Settings,
                         ),
                     )
-                    val isLeader = (projectModel.value!!.leader == FirebaseUtils.currentUserId())
+                    val isLeader = (projectModel.value!!.leader == currUID)
                     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
                     var topBarTitle by remember { mutableStateOf(items[0].title) }
                     Scaffold(
@@ -161,7 +161,14 @@ class ProjectActivity : ComponentActivity() {
                                 ChatScreen()
                             }
                             composable(items[2].title) {
-                                ProjectSettingsScreen(projectModel.value!!.members, isLeader)
+                                if (currUID != null) {
+                                    ProjectSettingsScreen(
+                                        projectModel.value!!.members,
+                                        currUID,
+                                        isLeader,
+                                        projectModel.value!!.id,
+                                        projectModel.value!!.name)
+                                }
                             }
                         }
                     }

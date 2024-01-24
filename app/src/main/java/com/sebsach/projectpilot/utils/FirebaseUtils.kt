@@ -22,12 +22,12 @@ class FirebaseUtils {
             return FirebaseAuth.getInstance().currentUser?.email
         }
         fun isLoggedIn(): Boolean{
-            return currentUserId() != null
+            return true
         }
         fun allUsers(): CollectionReference {
             return FirebaseFirestore.getInstance().collection("users")
         }
-        fun allProjects(): CollectionReference {
+        private fun allProjects(): CollectionReference {
             return FirebaseFirestore.getInstance().collection("projects")
         }
         fun userById(id: String): UserModel {
@@ -38,6 +38,13 @@ class FirebaseUtils {
                     documentSnapshot.toObject<UserModel>()!!
                 }
             return user
+        }
+        suspend fun getUserProjectRefs(userId: String): List<Map<String, String>> {
+            val documentSnapshot = allUsers().document(userId)
+                .get()
+                .await() // This will suspend the function until the result is available
+
+            return documentSnapshot.get("projectRefs") as List<Map<String, String>>
         }
         fun usersById(ids: List<String?>, onSuccess: (List<UserModel>) -> Unit) {
             val usersCollection = allUsers()
@@ -83,13 +90,24 @@ class FirebaseUtils {
                 .update("projectRefs", FieldValue.arrayUnion(mapOf("id" to referenceID, "name" to projectName)))
             println(referenceID + projectName)
         }
-        suspend fun getUserProjectRefs(userId: String): List<Map<String, String>> {
-            val documentSnapshot = allUsers().document(userId)
-                .get()
-                .await() // This will suspend the function until the result is available
-
-            return documentSnapshot.get("projectRefs") as List<Map<String, String>>
+        fun addUserToProject(projectName: String, projectId: String, uid: String) {
+            allProjects().document(projectId).update("members", FieldValue.arrayUnion(uid))
+            addProjectRef(uid, projectName, projectId)
         }
+        fun removeUserFromProject(projectName: String, projectId: String, uid: String) {
+            allProjects().document(projectId)
+                .update("members", FieldValue.arrayRemove(uid))
+
+            allUsers().document(uid).update("projectRefs", FieldValue.arrayRemove(mapOf("id" to projectId, "name" to projectName)))
+        }
+        fun deleteProject(projectId: String){
+            allProjects().document(projectId).delete()
+        }
+        fun changeLeader(uid: String, projectId: String){
+            allProjects().document(projectId)
+                .update("leader", uid)
+        }
+
         fun getProjectDetails(
             id: String,
             onSuccess: (ProjectModel) -> Unit,
@@ -110,5 +128,8 @@ class FirebaseUtils {
                     }
                 }
         }
+
+
+
     }
 }
