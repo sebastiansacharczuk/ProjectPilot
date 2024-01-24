@@ -1,6 +1,8 @@
 package com.sebsach.projectpilot.presentation.screens
 
+import android.content.ContentValues.TAG
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import com.sebsach.projectpilot.presentation.ProjectActivity
 import com.sebsach.projectpilot.utils.FirebaseUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -41,8 +44,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectListScreen() {
+fun ProjectListScreen(uid: String) {
     var projectRefsList by remember { mutableStateOf(listOf<Map<String, String>>()) }
+
     val loading = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -50,14 +54,23 @@ fun ProjectListScreen() {
     var inputProjectName by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     val username = FirebaseUtils.currentUserEmail()
+    LaunchedEffect(key1 = null) {
+        projectRefsList = FirebaseUtils.getUserProjectRefs(uid)
+        loading.value = false
+    }
+    LaunchedEffect(key1 = null) {
+        FirebaseUtils.allUsers().document(uid)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                return@addSnapshotListener
+            }
 
-    LaunchedEffect(key1 = Unit) {
-        scope.launch {
-
-            val userId = FirebaseUtils.currentUserId()
-            if (userId != null) {
-                projectRefsList = FirebaseUtils.getUserProjectRefs(userId)
+            if (snapshot != null && snapshot.exists()) {
+                projectRefsList = snapshot.get("projectRefs") as List<Map<String, String>>
                 loading.value = false
+            } else {
+                Log.d(TAG, "Current data: null")
             }
         }
     }
