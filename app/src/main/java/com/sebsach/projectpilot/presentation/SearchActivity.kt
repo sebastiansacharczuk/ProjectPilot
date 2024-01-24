@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -63,6 +64,8 @@ class SearchActivity : ComponentActivity() {
                     val focusManager = LocalFocusManager.current
                     var inputSearch by remember{ mutableStateOf("") }
                     val users = remember { mutableStateOf(listOf<UserModel>()) }
+                    var showButton by remember { mutableStateOf(false) }
+
                     Column {
                         Row(horizontalArrangement = Arrangement.SpaceBetween) {
                             IconButton(
@@ -122,20 +125,34 @@ class SearchActivity : ComponentActivity() {
                             modifier = Modifier.padding(10.dp)
                         ) {
                             items(users.value) { user ->
-                                Button(
-                                    onClick = { /*TODO*/ },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFFEBEBEB),
-                                        contentColor = Color.Black
-                                    )
-                                ) {
-                                    Text(text = user.username + if(user.uid == FirebaseUtils.currentUserId()) " (me)" else "")
+                                Row {
+                                    Button(
+                                        onClick = { showButton = true },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFFEBEBEB),
+                                            contentColor = Color.Black
+                                        )
+                                    ) {
+                                        Text(text = user.username + if (user.uid == FirebaseUtils.currentUserId()) " (me)" else "")
+                                    }
+                                    if (showButton) {
+                                        IconButton(onClick = {
+                                            intent.getStringExtra("project_id")?.let {
+                                                FirebaseUtils.addUserToProject(
+                                                    intent.getStringExtra("project_name")!!,
+                                                    it, user.uid)
+                                            }
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add"
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
-
                     }
-
                 }
             }
         }
