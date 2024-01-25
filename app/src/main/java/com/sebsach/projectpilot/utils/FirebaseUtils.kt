@@ -8,6 +8,7 @@ import com.google.firebase.firestore.toObject
 import com.sebsach.projectpilot.models.ProjectModel
 import com.sebsach.projectpilot.models.UserModel
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * @author Sebastian Sacharczuk
@@ -22,12 +23,12 @@ class FirebaseUtils {
             return FirebaseAuth.getInstance().currentUser?.email
         }
         fun isLoggedIn(): Boolean{
-            return true
+            return false
         }
         fun allUsers(): CollectionReference {
             return FirebaseFirestore.getInstance().collection("users")
         }
-        private fun allProjects(): CollectionReference {
+        fun allProjects(): CollectionReference {
             return FirebaseFirestore.getInstance().collection("projects")
         }
         fun userById(id: String): UserModel {
@@ -39,6 +40,13 @@ class FirebaseUtils {
                 }
             return user
         }
+
+        suspend fun isLeader(uid: String, projectId: String): Boolean {
+            val documentSnapshot = allProjects().document(projectId).get().await()
+            return documentSnapshot.get("leader") == uid
+        }
+
+
         suspend fun getUserProjectRefs(userId: String): List<Map<String, String>> {
             val documentSnapshot = allUsers().document(userId)
                 .get()
@@ -100,6 +108,11 @@ class FirebaseUtils {
 
             allUsers().document(uid).update("projectRefs", FieldValue.arrayRemove(mapOf("id" to projectId, "name" to projectName)))
         }
+
+        fun updateTasks(projectId: String, tasks: List<Map<String, Any>>) {
+            allProjects().document(projectId)
+                .update("tasks", tasks)
+        }
         fun deleteProject(projectId: String){
             allProjects().document(projectId).delete()
         }
@@ -128,8 +141,5 @@ class FirebaseUtils {
                     }
                 }
         }
-
-
-
     }
 }

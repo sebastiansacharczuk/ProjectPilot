@@ -1,7 +1,8 @@
 package com.sebsach.projectpilot.presentation.screens
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
@@ -26,9 +27,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,19 +47,49 @@ import com.sebsach.projectpilot.utils.FirebaseUtils
  * @github https://github.com/sebastiansacharczuk
  */
 
+data class Task(val name: String, var done: Boolean)
+
+@Suppress("UNCHECKED_CAST")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksScreen(
-    id: String,
+    projectId: String,
+    uid: String,
     tasks: List<Map<String, Any>>,
     isLeader: Boolean
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var leadership = isLeader
+    val taskList = remember { mutableStateListOf(*tasks.map {
+        Task(it["task"] as String, it["done"] as Boolean)
+    }.toTypedArray()) }
+    var showNewTaskDialog by remember { mutableStateOf(false) }
     var inputNewTask by remember { mutableStateOf("") }
 
-    if (showDialog) {
+    LaunchedEffect(key1 = null) {
+        FirebaseUtils.allProjects().document(projectId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(ContentValues.TAG, "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val tasksFromSnapshot = (snapshot.get("tasks") as List<Map<String, Any>>).map {
+                        Task(it["task"] as String, it["done"] as Boolean)
+                    }
+                    taskList.clear()
+                    taskList.addAll(tasksFromSnapshot)
+
+                    leadership = snapshot.get("leader") == uid
+                } else {
+                    Log.d(ContentValues.TAG, "Current data: null")
+                }
+            }
+    }
+
+    if (showNewTaskDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { showNewTaskDialog = false },
             title = { Text("New Task") },
             text = {
                 TextField(
@@ -65,9 +99,9 @@ fun TasksScreen(
             },
             confirmButton = {
                 Button(onClick = {
-                    FirebaseUtils.addNewTask(id, inputNewTask)
+                    FirebaseUtils.addNewTask(projectId, inputNewTask)
                     inputNewTask = ""
-                    showDialog = false
+                    showNewTaskDialog = false
                 }) {
                     Text("OK")
                 }
@@ -75,7 +109,7 @@ fun TasksScreen(
             dismissButton = {
                 Button(onClick = {
                     inputNewTask = ""
-                    showDialog = false
+                    showNewTaskDialog = false
                 }) {
                     Text("Cancel")
                 }
@@ -95,9 +129,9 @@ fun TasksScreen(
             Column {
 
                 IconButton(
-                    onClick = { showDialog = true },
+                    onClick = { showNewTaskDialog = true },
                     modifier = Modifier.align(Alignment.End),
-                    enabled = isLeader
+                    enabled = leadership
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                 }
@@ -109,7 +143,7 @@ fun TasksScreen(
                     ,
                     contentPadding = PaddingValues(6.dp)
                 ) {
-                    items(tasks) { item ->
+                    itemsIndexed(taskList) { index, item ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -124,13 +158,20 @@ fun TasksScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = item["task"].toString(),
+                                    text = item.name,
                                     fontSize = 20.sp,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Checkbox(
-                                    checked = item["done"] as Boolean,
-                                    onCheckedChange = null,
+                                    checked = item.done,
+                                    onCheckedChange = { isChecked ->
+                                        taskList[index] = item.copy(done = isChecked)
+                                        FirebaseUtils.updateTasks(
+                                            projectId,
+                                            taskList.map { task -> mapOf("task" to task.name, "done" to task.done) }
+                                        )
+                                    },
+                                    enabled = leadership,
                                     colors = CheckboxDefaults.colors(
                                         checkedColor = Color(0xFF006400),
                                         uncheckedColor = Color(0xFF8B0000)
@@ -155,4 +196,3 @@ fun TasksScreen(
         }
     }
 }
-

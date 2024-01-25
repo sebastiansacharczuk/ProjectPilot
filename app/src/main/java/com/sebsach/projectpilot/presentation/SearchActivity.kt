@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -65,6 +66,8 @@ class SearchActivity : ComponentActivity() {
                     var inputSearch by remember{ mutableStateOf("") }
                     val users = remember { mutableStateOf(listOf<UserModel>()) }
                     var showButton by remember { mutableStateOf(false) }
+                    var selectedUser by remember { mutableStateOf<String?>(null) }
+                    var clickCount by remember { mutableIntStateOf(0) }
 
                     Column {
                         Row(horizontalArrangement = Arrangement.SpaceBetween) {
@@ -127,7 +130,14 @@ class SearchActivity : ComponentActivity() {
                             items(users.value) { user ->
                                 Row {
                                     Button(
-                                        onClick = { showButton = true },
+                                        onClick = {
+                                            if (selectedUser == user.uid) {
+                                                clickCount++
+                                            } else {
+                                                clickCount = 1
+                                            }
+                                            selectedUser = user.uid
+                                                  },
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = Color(0xFFEBEBEB),
                                             contentColor = Color.Black
@@ -135,7 +145,7 @@ class SearchActivity : ComponentActivity() {
                                     ) {
                                         Text(text = user.username + if (user.uid == FirebaseUtils.currentUserId()) " (me)" else "")
                                     }
-                                    if (showButton) {
+                                    if (selectedUser == user.uid && clickCount % 2 != 0) {
                                         IconButton(onClick = {
                                             intent.getStringExtra("project_id")?.let {
                                                 FirebaseUtils.addUserToProject(

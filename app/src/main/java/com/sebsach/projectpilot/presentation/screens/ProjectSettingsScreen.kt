@@ -73,8 +73,8 @@ fun ProjectSettingsScreen(ids: List<String?>, currUID: String, isLeader: Boolean
                         FirebaseUtils.removeUserFromProject(projectName, projectId, currUID)
                         if (isLeader) {
                             FirebaseUtils.deleteProject(projectId)
-                            (context as Activity).finish()
                         }
+                        (context as Activity).finish()
                               },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {

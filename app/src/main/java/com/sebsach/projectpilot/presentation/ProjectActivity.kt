@@ -105,7 +105,7 @@ class ProjectActivity : ComponentActivity() {
                             title = "Settings",
                             selectedIcon = Icons.Filled.Settings,
                             unselectedIcon = Icons.Outlined.Settings,
-                        ),
+                        )
                     )
                     val isLeader = (projectModel.value!!.leader == currUID)
                     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -155,7 +155,14 @@ class ProjectActivity : ComponentActivity() {
                             innerPadding ->
                         NavHost(navController = navController, startDestination = items[0].title, modifier = Modifier.padding(innerPadding)) {
                             composable(items[0].title) {
-                                TasksScreen(projectModel.value!!.id, projectModel.value!!.tasks, isLeader)
+                                if (currUID != null) {
+                                    TasksScreen(
+                                        projectId = projectModel.value!!.id,
+                                        uid = currUID,
+                                        tasks = projectModel.value!!.tasks.map { it.toMutableMap() },
+                                        isLeader = isLeader
+                                    )
+                                }
                             }
                             composable(items[1].title) {
                                 ChatScreen()
@@ -163,11 +170,11 @@ class ProjectActivity : ComponentActivity() {
                             composable(items[2].title) {
                                 if (currUID != null) {
                                     ProjectSettingsScreen(
-                                        projectModel.value!!.members,
-                                        currUID,
-                                        isLeader,
-                                        projectModel.value!!.id,
-                                        projectModel.value!!.name)
+                                        ids = projectModel.value!!.members,
+                                        currUID = currUID,
+                                        isLeader = isLeader,
+                                        projectId = projectModel.value!!.id,
+                                        projectName = projectModel.value!!.name)
                                 }
                             }
                         }
