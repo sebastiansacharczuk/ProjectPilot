@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.sebsach.projectpilot.models.ProjectModel
 import com.sebsach.projectpilot.presentation.screens.ChatScreen
 import com.sebsach.projectpilot.presentation.screens.ProjectSettingsScreen
@@ -165,7 +167,13 @@ class ProjectActivity : ComponentActivity() {
                                 }
                             }
                             composable(items[1].title) {
-                                ChatScreen()
+                                FirebaseUtils.currentUserEmail()?.let { it1 ->
+                                    ChatScreen(
+                                        projectId = projectModel.value!!.id,
+                                        username = it1,
+                                        chat = projectModel.value!!.chat
+                                    )
+                                }
                             }
                             composable(items[2].title) {
                                 if (currUID != null) {

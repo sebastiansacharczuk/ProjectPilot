@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.sebsach.projectpilot.models.ProjectModel
 import com.sebsach.projectpilot.models.UserModel
+import com.sebsach.projectpilot.presentation.screens.Message
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.suspendCoroutine
 
@@ -92,6 +93,9 @@ class FirebaseUtils {
         }
         fun addNewTask(id: String, task: String){
             allProjects().document(id).update("tasks", FieldValue.arrayUnion(mapOf("task" to task, "done" to false)))
+        }
+        fun addMessage(projectId: String, content: String, username: String){
+            allProjects().document(projectId).update("chat", FieldValue.arrayUnion(mapOf("content" to content, "author" to username)))
         }
         fun addProjectRef(uid: String, projectName: String, referenceID: String) {
             allUsers().document(uid)
