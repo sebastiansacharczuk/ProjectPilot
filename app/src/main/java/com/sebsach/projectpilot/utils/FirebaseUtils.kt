@@ -24,7 +24,11 @@ class FirebaseUtils {
             return FirebaseAuth.getInstance().currentUser?.email
         }
         fun isLoggedIn(): Boolean{
-            return false
+            return FirebaseAuth.getInstance().uid != null
+        }
+
+        fun logout() {
+            FirebaseAuth.getInstance().signOut()
         }
         fun allUsers(): CollectionReference {
             return FirebaseFirestore.getInstance().collection("users")
@@ -118,8 +122,26 @@ class FirebaseUtils {
                 .update("tasks", tasks)
         }
         fun deleteProject(projectId: String){
-            allProjects().document(projectId).delete()
+            // Get the project document
+            val projectDocument = allProjects().document(projectId)
+
+            // Get the project details
+            projectDocument.get().addOnSuccessListener { document ->
+                if (document != null) {
+                    // Get the members of the project
+                    val members = document.get("members") as List<String>
+
+                    // For each member, remove the project reference
+                    for (memberId in members) {
+                        removeUserFromProject(document.get("name") as String, projectId, memberId)
+                    }
+
+                    // Delete the project document
+                    projectDocument.delete()
+                }
+            }
         }
+
         fun changeLeader(uid: String, projectId: String){
             allProjects().document(projectId)
                 .update("leader", uid)

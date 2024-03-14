@@ -78,6 +78,7 @@ class SignUpActivity : ComponentActivity() {
                             value = inputEmail,
                             onValueChange = { inputEmail = it },
                             label = { Text("email") },
+                            singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
@@ -90,6 +91,7 @@ class SignUpActivity : ComponentActivity() {
                             value = inputPassword,
                             onValueChange = {inputPassword = it},
                             label = { Text("password") },
+                            singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password)
@@ -102,6 +104,7 @@ class SignUpActivity : ComponentActivity() {
                             value = inputConfirmPassword,
                             onValueChange = { inputConfirmPassword = it },
                             label = { Text("confirm password") },
+                            singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password)

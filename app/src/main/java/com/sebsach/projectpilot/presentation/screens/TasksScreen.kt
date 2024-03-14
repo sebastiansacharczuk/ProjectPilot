@@ -183,16 +183,5 @@ fun TasksScreen(
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp) // Adjust this to change the height of the deadline field box
-                .background(Color(0xFFE6E6E6)) // This makes the background color the same as the LazyColumn
-                .padding(14.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Deadline field")
-        }
     }
 }

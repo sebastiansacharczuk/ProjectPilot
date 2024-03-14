@@ -89,6 +89,7 @@ class SignInActivity : ComponentActivity() {
                             value = inputNickname,
                             onValueChange = { inputNickname = it },
                             label = { Text("nickname") },
+                            singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
                             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
@@ -100,6 +101,7 @@ class SignInActivity : ComponentActivity() {
                             value = inputPassword,
                             onValueChange = {inputPassword = it},
                             label = { Text("password") },
+                            singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
                             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),

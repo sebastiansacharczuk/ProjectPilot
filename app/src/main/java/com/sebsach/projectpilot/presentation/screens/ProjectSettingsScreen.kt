@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -92,9 +94,10 @@ fun ProjectSettingsScreen(ids: List<String?>, currUID: String, isLeader: Boolean
         )
     }
 
+
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopStart
+        contentAlignment = Alignment.TopCenter
     ) {
         Column {
             LaunchedEffect(key1 = ids) {
@@ -102,7 +105,7 @@ fun ProjectSettingsScreen(ids: List<String?>, currUID: String, isLeader: Boolean
                     members = users
                 }
             }
-            Row {
+            Row(modifier = Modifier.padding(8.dp)){
                 Button(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector =
@@ -127,9 +130,9 @@ fun ProjectSettingsScreen(ids: List<String?>, currUID: String, isLeader: Boolean
                     }
                 }
             }
-            Column {
+            Column(modifier = Modifier.padding(8.dp)) {
                 if (expanded) {
-                    LazyColumn {
+                    LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                         items(items = members) { member ->
                             Row {
                                 Button(
@@ -144,6 +147,7 @@ fun ProjectSettingsScreen(ids: List<String?>, currUID: String, isLeader: Boolean
                                     enabled = isLeader && member.uid != currUID
                                 ) {
                                     Text(text = member.username)
+                                    // Icon(imageVector = Icons.Default.Star , contentDescription = "star")
                                 }
                                 if (selectedMember == member.uid && clickCount % 2 != 0) {
                                     IconButton(onClick = {
