@@ -28,8 +28,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -42,7 +44,7 @@ import com.sebsach.projectpilot.utils.FirebaseUtils
 
 data class Message(var content: String, var author: String)
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ChatScreen(
     projectId: String,
@@ -54,6 +56,7 @@ fun ChatScreen(
     val chatList = remember { mutableStateListOf(*chat.map {
         Message((it["content"] as? String) ?: "", (it["author"] as? String) ?: "")
     }.toTypedArray()) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = null) {
         FirebaseUtils.allProjects().document(projectId)
@@ -127,7 +130,11 @@ fun ChatScreen(
             )
 
             Button(
-                onClick = { FirebaseUtils.addMessage(projectId, text, username) },
+                onClick = {
+                    FirebaseUtils.addMessage(projectId, text, username)
+                    text = ""
+                    keyboardController?.hide()
+                          },
                 modifier = Modifier.padding(start = 8.dp),
                 enabled = text.isNotBlank()  // Enable button only when text is not blank
             ) {

@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -101,6 +102,7 @@ class SignInActivity : ComponentActivity() {
                             value = inputPassword,
                             onValueChange = {inputPassword = it},
                             label = { Text("password") },
+                            visualTransformation = PasswordVisualTransformation(),
                             singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),

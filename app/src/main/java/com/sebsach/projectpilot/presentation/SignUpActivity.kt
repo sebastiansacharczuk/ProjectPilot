@@ -28,9 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
@@ -66,6 +68,7 @@ class SignUpActivity : ComponentActivity() {
                     var inputEmail by remember { (mutableStateOf("")) }
                     var inputPassword by remember { (mutableStateOf("")) }
                     var inputConfirmPassword by remember { (mutableStateOf("")) }
+
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,6 +94,7 @@ class SignUpActivity : ComponentActivity() {
                             value = inputPassword,
                             onValueChange = {inputPassword = it},
                             label = { Text("password") },
+                            visualTransformation = PasswordVisualTransformation(),
                             singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
@@ -104,6 +108,7 @@ class SignUpActivity : ComponentActivity() {
                             value = inputConfirmPassword,
                             onValueChange = { inputConfirmPassword = it },
                             label = { Text("confirm password") },
+                            visualTransformation = PasswordVisualTransformation(),
                             singleLine = true,
                             shape = CircleShape,
                             colors = TextFieldDefaults.textFieldColors(focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent),
